@@ -69,6 +69,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const nextBtn = document.getElementById('nextBtn');
     const resetBtn = document.getElementById('resetBtn');
     let isAnimating = false;
+    let isDragging = false;
+    let startX = 0;
+    let startY = 0;
+    let startTime = 0;
 
     function updateDeckVisuals() {
         cards.forEach((card, idx) => {
@@ -78,7 +82,8 @@ document.addEventListener('DOMContentLoaded', () => {
             
             anime({
                 targets: card,
-                translateY: offset * 30,
+                translateX: 0, // Explicitly reset drag X
+                translateY: offset * 30, // Safely resets drag Y to visual offset
                 scale: 1 - (offset * 0.05),
                 translateZ: -offset * 50,
                 rotateZ: 0, // Reset random drag rotations
@@ -112,9 +117,13 @@ document.addEventListener('DOMContentLoaded', () => {
         easing: 'easeOutQuint',
     });
 
-    function nextCard(dir = -1) {
+    function nextCard(dirX = -1, dirY = 0) {
+        if (typeof dirX === 'object') dirX = -1;
+        if (typeof dirY === 'object') dirY = 0;
+
         if (currentIdx >= cards.length || isAnimating) return;
         isAnimating = true;
+        isDragging = false; // Abort any active drag to prevent race conditions
         
         const cardToToss = cards[currentIdx];
         if (!cardToToss) {
@@ -123,15 +132,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         currentIdx++;
         
-        // Toss animation horizontally
+        // Toss animation in the given direction
         anime({
             targets: cardToToss,
-            translateX: dir * window.innerWidth * 1.5,
-            rotateZ: dir * 15,
+            translateX: dirX * window.innerWidth * 1.5,
+            translateY: dirY * window.innerHeight * 1.5,
+            rotateZ: dirX * 15,
             rotateX: 10,
             opacity: 0,
-            duration: 800,
-            easing: 'easeInQuart',
+            duration: 400, // snappier duration
+            easing: 'easeOutExpo', // immediate fly off
             complete: () => {
                 isAnimating = false;
             }
@@ -142,6 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function prevCard() {
         if (currentIdx <= 0 || isAnimating) return;
         isAnimating = true;
+        isDragging = false; // Abort any active drag
         
         currentIdx--;
         const cardToRecover = cards[currentIdx];
@@ -150,6 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
         anime({
             targets: cardToRecover,
             translateX: [-window.innerWidth, 0],
+            translateY: [0, 0],
             rotateZ: [-15, 0],
             rotateX: [10, 0],
             translateZ: [50, 0],
@@ -167,27 +179,64 @@ document.addEventListener('DOMContentLoaded', () => {
     function resetDeck() {
         if (currentIdx === 0 || isAnimating) return;
         isAnimating = true;
+        isDragging = false; // Abort any active drag
 
-        // Take all tossed cards and reverse them so the top card flies in last
         const cardsToRecover = cards.slice(0, currentIdx).reverse();
-        currentIdx = 0;
-        updateDeckVisuals(); // Instant snap background properties
+        const backgroundCards = cards.slice(currentIdx);
+        currentIdx = 0; // Final state
+        
+        // Instantly update nav buttons
+        prevBtn.disabled = true;
+        resetBtn.disabled = true;
+        nextBtn.disabled = false;
+        
+        // Let the remaining deck cards sink down out of the way instantly
+        backgroundCards.forEach((card) => {
+            const finalIdx = parseInt(card.dataset.index);
+            anime({
+                targets: card,
+                translateX: 0,
+                translateY: finalIdx * 30, 
+                scale: 1 - (finalIdx * 0.05),
+                translateZ: -finalIdx * 50,
+                rotateZ: 0,
+                rotateX: 0,
+                opacity: finalIdx > 2 ? 0 : 1,
+                zIndex: 100 - finalIdx,
+                duration: 600,
+                easing: 'easeOutQuint',
+            });
+        });
 
         // Recover animation sequence
         anime({
             targets: cardsToRecover,
             translateX: [-window.innerWidth, 0],
+            translateY: (el) => {
+                const finalIdx = parseInt(el.dataset.index);
+                const offset = Math.min(finalIdx, 3);
+                return [0, offset * 30];
+            },
+            scale: (el) => {
+                const finalIdx = parseInt(el.dataset.index);
+                const offset = Math.min(finalIdx, 3);
+                return [1, 1 - (offset * 0.05)];
+            },
+            translateZ: (el) => {
+                const finalIdx = parseInt(el.dataset.index);
+                const offset = Math.min(finalIdx, 3);
+                return [50, -offset * 50];
+            },
             rotateZ: [-15, 0],
             rotateX: [10, 0],
-            translateZ: [50, 0],
-            opacity: [0, 1],
-            zIndex: (el, i, l) => 100 + i, // Highest z-index to fly above rest
+            opacity: [0, 1], // Always visible during the fly-in
+            zIndex: (el) => 100 - parseInt(el.dataset.index), // Correctly layer on top of each other
             duration: 800,
-            delay: anime.stagger(100), // Stagger fly-in rapidly
+            delay: anime.stagger(150), // Stagger fly-in rapidly one by one
             easing: 'easeOutQuart',
             complete: () => {
                 isAnimating = false;
-                updateDeckVisuals(); // Re-sync Z-indexes statically
+                updateDeckVisuals(); // Re-sync Z-indexes and gracefully fade out buried cards
             }
         });
     }
@@ -202,9 +251,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- DRAG / SWIPE LOGIC ---
-    let startX = 0;
-    let isDragging = false;
-    let startTime = 0;
 
     cards.forEach(card => {
         card.addEventListener('pointerdown', (e) => {
@@ -217,6 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (e.target.closest('.btn') || e.target.closest('a')) return;
             
             startX = e.clientX;
+            startY = e.clientY;
             startTime = Date.now();
             isDragging = true;
             card.setPointerCapture(e.pointerId);
@@ -231,30 +278,43 @@ document.addEventListener('DOMContentLoaded', () => {
             if (myIndex !== currentIdx) return;
             
             const dx = e.clientX - startX;
-            // Allow left or right drag
+            const dy = e.clientY - startY;
+            // Allow drag in any direction
             anime.set(card, {
                 translateX: dx,
+                translateY: dy,
                 rotateZ: dx * 0.05 // tilt slightly while dragging
             });
         });
 
         card.addEventListener('pointerup', (e) => {
-            if (!isDragging) return;
+            if (!isDragging) {
+                try { card.releasePointerCapture(e.pointerId); } catch(err) {}
+                return;
+            }
             isDragging = false;
-            card.releasePointerCapture(e.pointerId);
+            try { card.releasePointerCapture(e.pointerId); } catch(err) {}
             
-            const dx = e.clientX - startX;
-            const velocity = Math.abs(dx) / (Date.now() - startTime);
+            // Double check index hasn't shifted from quick sequential actions
+            const myIndex = parseInt(card.dataset.index);
+            if (myIndex !== currentIdx) return;
 
-            // If swiped far enough or fast enough horizontally
-            if (Math.abs(dx) > 100 || (Math.abs(dx) > 20 && velocity > 0.5)) {
-                const dir = dx > 0 ? 1 : -1;
-                nextCard(dir);
+            const dx = e.clientX - startX;
+            const dy = e.clientY - startY;
+            const distance = Math.hypot(dx, dy);
+            const velocity = distance / (Date.now() - startTime);
+
+            // If swiped far enough or fast enough in any direction
+            if (distance > 40 || (distance > 10 && velocity > 0.3)) {
+                const dirX = dx / distance;
+                const dirY = dy / distance;
+                nextCard(dirX, dirY);
             } else {
                 // Return to base position
                 anime({
                     targets: card,
                     translateX: 0,
+                    translateY: 0, // ensure Y returns to 0
                     scale: 1,
                     rotateZ: 0,
                     duration: 400,
