@@ -351,6 +351,29 @@ p {
     font-size: 0.8rem;
 }
 
+
+/* Project Tags & Badges */
+.project-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.8rem;
+}
+
+.tag {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid currentColor;
+    padding: 0.2rem 0.5rem;
+    font-size: 0.75rem;
+    border-radius: 4px;
+    font-weight: 500;
+    display: inline-block;
+}
+
+.tertiary-block .tag {
+    background: rgba(0, 0, 0, 0.05);
+}
+
 /* Snorlax Background Animation */
 .snorlax-container {
     position: fixed;
