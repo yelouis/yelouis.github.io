@@ -30,7 +30,7 @@
 <body>
 
 <h1>Gaslight Parlor — Privacy Policy</h1>
-<p class="updated">Last updated: 26 August 2026</p>
+<p class="updated">Last updated: 3 November 2026</p>
 
 <p>Gaslight Parlor is a party game you play with friends. This policy explains exactly
 what the app stores, why, and for how long. It applies to the iOS app and to the web
@@ -40,7 +40,7 @@ version.</p>
 <ul>
   <li>There are no accounts. You never give us an email address, a password, or a phone number.</li>
   <li>We store the display name you type, the answers you write during a game, and your score — for as long as the game lasts.</li>
-  <li>Game rooms and everything in them are <strong>deleted automatically after 8 hours</strong>.</li>
+  <li>Game rooms and everything in them are <strong>deleted automatically</strong>, normally within two days of your game.</li>
   <li>There is no advertising, no analytics, and no tracking. Nothing is sold or shared with anyone.</li>
 </ul>
 
@@ -57,7 +57,7 @@ version.</p>
     <td>So other players in your room can see who wrote what.</td>
   </tr>
   <tr>
-    <td><strong>What you write during a game</strong> — your truthful answers, your invented ones, any prompts you contribute to a custom deck, your votes, and your emoji reactions.</td>
+    <td><strong>What you write during a game</strong> — your truthful answers, your invented ones, any prompts you contribute to a custom deck, and your votes and accusations.</td>
     <td>This is the game itself. Other players in your room see these as the round unfolds.</td>
   </tr>
   <tr>
@@ -73,7 +73,7 @@ version.</p>
 <h2>What the app does not collect</h2>
 <ul>
   <li>No email address, password, phone number, or real name — sign-in is anonymous.</li>
-  <li>No contacts, photos, camera, microphone, or location. The app requests none of these permissions.</li>
+  <li>No contacts, photos, camera, microphone, or location. The iOS app asks for one permission, and only if you use it: <strong>add-only access to Photos</strong>, the first time you choose Save Image for the end-of-game Case File. It never reads your photo library.</li>
   <li>No advertising identifiers, and no advertising of any kind.</li>
   <li>No analytics or crash-reporting SDK. We do not measure how you use the app.</li>
   <li>No tracking, and no sharing of data with data brokers or advertisers.</li>
@@ -86,28 +86,56 @@ on servers in the United States. Google's handling of it is governed by the
 <a href="https://firebase.google.com/support/privacy">Firebase Privacy and Security</a> terms.</p>
 <p>No other third party receives any of it.</p>
 
+<h2>Keeping the game safe</h2>
+<ul>
+  <li><strong>A word filter.</strong> Display names, answers and custom prompts are checked on our server against a list of slurs before they are used. Nothing is sent outside Firebase to do this.</li>
+  <li><strong>Reports.</strong> Any player can report an answer or a custom prompt from the reveal screen. A report stores the reported text, the prompt it was written for, the room code and the time, so we can review it. It does not record who sent the report or who wrote the text, and it is deleted automatically <strong>30 days</strong> after the latest report of that text.</li>
+  <li><strong>Removed players.</strong> If the host removes a player, our server keeps that player's anonymous ID with the room so they cannot rejoin it. It is deleted with the room.</li>
+</ul>
+
 <h2>How long it is kept</h2>
-<p>Every game room, and every player record inside it, carries an expiry set to
-<strong>8 hours</strong> after it was created. Firebase deletes them automatically once that
-passes. If you leave a game, your player record is removed at that point.</p>
-<p>Because there are no accounts, there is nothing that persists between games beyond this.</p>
+<table>
+  <tr><th>Data</th><th>How long</th></tr>
+  <tr>
+    <td><strong>A game room and everything in it</strong> — names, answers, prompts, votes and scores</td>
+    <td>The room expires <strong>8 hours after its last activity</strong>, and an automatic daily cleanup deletes it — normally within two days of your game. If you leave a game, your player record is removed at that point; answers you already gave stay in that game's record until the room is deleted.</td>
+  </tr>
+  <tr>
+    <td><strong>The anonymous player ID</strong></td>
+    <td>Deleted automatically after <strong>24 hours</strong> without use, at the next daily cleanup.</td>
+  </tr>
+  <tr>
+    <td><strong>Reports</strong></td>
+    <td>Deleted automatically <strong>30 days</strong> after the latest report of that text.</td>
+  </tr>
+  <tr>
+    <td><strong>Server logs</strong></td>
+    <td>Google Cloud keeps standard request logs for up to 30 days. We do not use them to identify anyone.</td>
+  </tr>
+</table>
+<p>Because there are no accounts, nothing persists between games beyond this.</p>
 
 <h2>What stays on your device</h2>
-<p>The app stores your current room code and player ID locally so it can put you back
-into your game if the app is closed and reopened. Deleting the app removes it. The
+<p>The app stores a random player ID, your current room code, a rejoin token and your
+sound setting locally, so it can put you back into your game if the app is closed and
+reopened. Deleting the app removes them. iOS may keep the anonymous sign-in in its
+Keychain after the app is deleted, but the account it points to is deleted on our side
+after 24 hours without use. The
 end-of-game "Case File" image is generated on your device — on iOS it is handed to the
 system share sheet, and on the web it is saved to your downloads. It is not uploaded
 anywhere.</p>
 
 <h2>Children</h2>
 <p>Gaslight Parlor is not directed at children under 13, and we do not knowingly collect
-information from them. The game's prompt decks include adult-themed options, which the
-host chooses when setting up a room.</p>
+information from them. The game's prompt decks include an adults-only option, which the
+host chooses when setting up a room. If you believe a child has played, contact us with
+the room code and we will delete that room's data.</p>
 
 <h2>Your choices</h2>
 <p>Because we hold no account, there is no profile to log into or delete. If you want the
-data from a game removed sooner than the automatic 8-hour expiry, leave the room — or
-contact us with the 4-letter room code and we will delete it.</p>
+data from a game removed sooner than the automatic deletion, leave the room — or
+contact us with the 4-letter room code and we will delete it. For help with the game, see
+the <a href="support.html">support page</a>.</p>
 
 <h2>Changes</h2>
 <p>If this policy changes, the date at the top changes with it.</p>
