@@ -69,72 +69,93 @@ document.addEventListener('DOMContentLoaded', () => {
     const nextBtn = document.getElementById('nextBtn');
     const resetBtn = document.getElementById('resetBtn');
     let isAnimating = false;
+    let unlockTimer = null;
     let isDragging = false;
     let startX = 0;
     let startY = 0;
     let startTime = 0;
 
-    function updateDeckVisuals() {
-        cards.forEach((card, idx) => {
-            if (idx < currentIdx) return; // Animated away previously
-            
-            const offset = (idx - currentIdx); // 0 is top, 1 is under, 2 is bottom
-            
-            anime({
-                targets: card,
-                translateX: 0, // Explicitly reset drag X
-                translateY: offset * 30, // Safely resets drag Y to visual offset
-                scale: 1 - (offset * 0.05),
-                translateZ: -offset * 50,
-                rotateZ: 0, // Reset random drag rotations
-                rotateX: 0,
-                opacity: offset > 2 ? 0 : 1, // Only show top 3
-                zIndex: 100 - offset,
-                duration: 600,
-                easing: 'easeOutQuint',
-            });
-        });
+    // Each card is driven by at most one animation at a time. Starting a new
+    // one cancels whatever is still running on that card; otherwise a stale
+    // tween (the intro, a restack, a restart) keeps writing its end pose after
+    // a shorter toss has finished and drags a discarded card back on top.
+    function animateCard(card, { zIndex, ...params }) {
+        anime.remove(card);
+        if (zIndex !== undefined) card.style.zIndex = zIndex;
+        return anime({ targets: card, ...params });
+    }
 
-        // Update nav buttons
+    // Lock input for a fixed time instead of waiting on an animation's
+    // complete callback, which never fires once that animation is cancelled.
+    function lockFor(ms, then) {
+        isAnimating = true;
+        clearTimeout(unlockTimer);
+        unlockTimer = setTimeout(() => {
+            isAnimating = false;
+            if (then) then();
+        }, ms);
+    }
+
+    // Resting pose for a card `offset` places below the top of the deck.
+    function stackPose(offset) {
+        return {
+            translateX: 0,
+            translateY: offset * 30,
+            scale: 1 - (offset * 0.05),
+            translateZ: -offset * 50,
+            rotateZ: 0,
+            rotateX: 0,
+            opacity: offset > 2 ? 0 : 1, // Only show top 3
+            zIndex: 100 - offset,
+        };
+    }
+
+    function updateButtons() {
         prevBtn.disabled = currentIdx === 0;
         resetBtn.disabled = currentIdx === 0;
         nextBtn.disabled = currentIdx === cards.length;
     }
 
-    // Initial positioning
-    anime.set(cards, { opacity: 0 }); // Hide immediately to block flicker
-    
-    // In sequence stagger animate in
-    anime({
-        targets: cards,
-        translateY: (el, i) => (i * 30),
-        scale: (el, i) => 1 - (i * 0.05),
-        translateZ: (el, i) => -(i * 50),
-        opacity: (el, i) => i > 2 ? 0 : [0, 1],
-        zIndex: (el, i) => 100 - i,
-        duration: 800,
-        delay: anime.stagger(150),
-        easing: 'easeOutQuint',
+    // Settle every card still in the deck into its slot, except any in `skip`
+    // that already have their own animation.
+    function updateDeckVisuals(skip = new Set()) {
+        cards.forEach((card, idx) => {
+            if (idx < currentIdx || skip.has(card)) return; // Already tossed
+            animateCard(card, {
+                ...stackPose(idx - currentIdx),
+                duration: 600,
+                easing: 'easeOutQuint',
+            });
+        });
+        updateButtons();
+    }
+
+    // Initial positioning: hide immediately to block flicker, then deal the
+    // deck in one card at a time.
+    anime.set(cards, { opacity: 0 });
+    cards.forEach((card, i) => {
+        animateCard(card, {
+            ...stackPose(i),
+            opacity: i > 2 ? 0 : [0, 1],
+            duration: 800,
+            delay: i * 150,
+            easing: 'easeOutQuint',
+        });
     });
+    updateButtons();
 
     function nextCard(dirX = -1, dirY = 0) {
         if (typeof dirX === 'object') dirX = -1;
         if (typeof dirY === 'object') dirY = 0;
-
         if (currentIdx >= cards.length || isAnimating) return;
-        isAnimating = true;
         isDragging = false; // Abort any active drag to prevent race conditions
-        
+
         const cardToToss = cards[currentIdx];
-        if (!cardToToss) {
-            isAnimating = false;
-            return;
-        }
         currentIdx++;
-        
+        lockFor(400);
+
         // Toss animation in the given direction
-        anime({
-            targets: cardToToss,
+        animateCard(cardToToss, {
             translateX: dirX * window.innerWidth * 1.5,
             translateY: dirY * window.innerHeight * 1.5,
             rotateZ: dirX * 15,
@@ -142,26 +163,23 @@ document.addEventListener('DOMContentLoaded', () => {
             opacity: 0,
             duration: 400, // snappier duration
             easing: 'easeOutExpo', // immediate fly off
-            complete: () => {
-                isAnimating = false;
-            }
         });
         updateDeckVisuals();
     }
 
     function prevCard() {
         if (currentIdx <= 0 || isAnimating) return;
-        isAnimating = true;
         isDragging = false; // Abort any active drag
-        
+
         currentIdx--;
         const cardToRecover = cards[currentIdx];
-        
-        // Recover animation from left by default
-        anime({
-            targets: cardToRecover,
+        lockFor(800);
+
+        // Recover animation from the left
+        animateCard(cardToRecover, {
             translateX: [-window.innerWidth, 0],
             translateY: [0, 0],
+            scale: 1,
             rotateZ: [-15, 0],
             rotateX: [10, 0],
             translateZ: [50, 0],
@@ -169,76 +187,40 @@ document.addEventListener('DOMContentLoaded', () => {
             zIndex: 100, // Forces top immediately during animation
             duration: 800,
             easing: 'easeOutQuart',
-            complete: () => {
-                isAnimating = false;
-            }
         });
-        updateDeckVisuals();
+        updateDeckVisuals(new Set([cardToRecover]));
     }
 
     function resetDeck() {
         if (currentIdx === 0 || isAnimating) return;
-        isAnimating = true;
         isDragging = false; // Abort any active drag
 
+        // Deepest tossed card flies back first, the hero card lands last on top
         const cardsToRecover = cards.slice(0, currentIdx).reverse();
-        const backgroundCards = cards.slice(currentIdx);
-        currentIdx = 0; // Final state
-        
-        // Instantly update nav buttons
-        prevBtn.disabled = true;
-        resetBtn.disabled = true;
-        nextBtn.disabled = false;
-        
-        // Let the remaining deck cards sink down out of the way instantly
-        backgroundCards.forEach((card) => {
-            const finalIdx = parseInt(card.dataset.index);
-            anime({
-                targets: card,
-                translateX: 0,
-                translateY: finalIdx * 30, 
-                scale: 1 - (finalIdx * 0.05),
-                translateZ: -finalIdx * 50,
-                rotateZ: 0,
-                rotateX: 0,
-                opacity: finalIdx > 2 ? 0 : 1,
-                zIndex: 100 - finalIdx,
-                duration: 600,
-                easing: 'easeOutQuint',
+        currentIdx = 0;
+
+        // Let the cards still in the deck sink down to their final slots
+        updateDeckVisuals(new Set(cardsToRecover));
+
+        cardsToRecover.forEach((card, k) => {
+            const offset = Math.min(parseInt(card.dataset.index), 3);
+            animateCard(card, {
+                translateX: [-window.innerWidth, 0],
+                translateY: [0, offset * 30],
+                scale: [1, 1 - (offset * 0.05)],
+                translateZ: [50, -offset * 50],
+                rotateZ: [-15, 0],
+                rotateX: [10, 0],
+                opacity: [0, 1], // Always visible during the fly-in
+                zIndex: 100 - parseInt(card.dataset.index),
+                duration: 800,
+                delay: k * 150, // Fly in rapidly one by one
+                easing: 'easeOutQuart',
             });
         });
 
-        // Recover animation sequence
-        anime({
-            targets: cardsToRecover,
-            translateX: [-window.innerWidth, 0],
-            translateY: (el) => {
-                const finalIdx = parseInt(el.dataset.index);
-                const offset = Math.min(finalIdx, 3);
-                return [0, offset * 30];
-            },
-            scale: (el) => {
-                const finalIdx = parseInt(el.dataset.index);
-                const offset = Math.min(finalIdx, 3);
-                return [1, 1 - (offset * 0.05)];
-            },
-            translateZ: (el) => {
-                const finalIdx = parseInt(el.dataset.index);
-                const offset = Math.min(finalIdx, 3);
-                return [50, -offset * 50];
-            },
-            rotateZ: [-15, 0],
-            rotateX: [10, 0],
-            opacity: [0, 1], // Always visible during the fly-in
-            zIndex: (el) => 100 - parseInt(el.dataset.index), // Correctly layer on top of each other
-            duration: 800,
-            delay: anime.stagger(150), // Stagger fly-in rapidly one by one
-            easing: 'easeOutQuart',
-            complete: () => {
-                isAnimating = false;
-                updateDeckVisuals(); // Re-sync Z-indexes and gracefully fade out buried cards
-            }
-        });
+        // Once every card has landed, fade out the ones buried below the top 3
+        lockFor(800 + (cardsToRecover.length - 1) * 150, () => updateDeckVisuals());
     }
 
     prevBtn.addEventListener('click', prevCard);
@@ -257,32 +239,33 @@ document.addEventListener('DOMContentLoaded', () => {
             // Only drag top card
             const myIndex = parseInt(card.dataset.index);
             if (myIndex !== currentIdx || isAnimating) return;
-            
-            // Only allow background of card to trigger drag, not buttons/links or scrollbar
-            // Prevent drag if click inside a scrollable area that is actually scrolling
+
+            // Only allow background of card to trigger drag, not buttons/links
             if (e.target.closest('.btn') || e.target.closest('a')) return;
-            
+
             startX = e.clientX;
             startY = e.clientY;
             startTime = Date.now();
             isDragging = true;
             card.setPointerCapture(e.pointerId);
-            
+
             // Slightly pull the card up visually
-            anime({ targets: card, scale: 1.02, duration: 200, easing: 'easeOutQuad' });
+            animateCard(card, { scale: 1.02, duration: 200, easing: 'easeOutQuad' });
         });
 
         card.addEventListener('pointermove', (e) => {
             if (!isDragging) return;
             const myIndex = parseInt(card.dataset.index);
             if (myIndex !== currentIdx) return;
-            
+
             const dx = e.clientX - startX;
             const dy = e.clientY - startY;
-            // Allow drag in any direction
+            // Allow drag in any direction; the finger owns the card now
+            anime.remove(card);
             anime.set(card, {
                 translateX: dx,
                 translateY: dy,
+                scale: 1.02,
                 rotateZ: dx * 0.05 // tilt slightly while dragging
             });
         });
@@ -294,7 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             isDragging = false;
             try { card.releasePointerCapture(e.pointerId); } catch(err) {}
-            
+
             // Double check index hasn't shifted from quick sequential actions
             const myIndex = parseInt(card.dataset.index);
             if (myIndex !== currentIdx) return;
@@ -311,8 +294,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 nextCard(dirX, dirY);
             } else {
                 // Return to base position
-                anime({
-                    targets: card,
+                animateCard(card, {
                     translateX: 0,
                     translateY: 0, // ensure Y returns to 0
                     scale: 1,
