@@ -155,8 +155,7 @@ strong {
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
     /* Snorlax Background ensures invisible backs if flipped, but we manage via Anime */
     background: transparent;
-    touch-action: pan-y;
-    /* allow click/drag */
+    touch-action: none; /* swipes go to the deck (see .card-content) */
     cursor: grab;
     transform-origin: center calc(100% + 200px);
     /* Rotate away as if hinged far below */
@@ -193,6 +192,10 @@ strong {
     justify-content: safe center;
     overflow-x: hidden;
     overflow-y: auto;
+    /* This box is a scroll container, so it (not .card) decides what a touch
+       does. Swipes in every direction go to the deck; main.js re-enables
+       vertical panning only on a card whose content has to scroll. */
+    touch-action: none;
 }
 
 /* Block modifiers */

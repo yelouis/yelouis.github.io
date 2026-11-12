@@ -234,6 +234,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- DRAG / SWIPE LOGIC ---
 
+    // Swipes in every direction belong to the deck: the page itself never
+    // scrolls, so the browser has no use for them. Only a card whose content
+    // overflows (a viewport too short for the card's shape) lets the browser
+    // pan vertically so that content can still be scrolled by touch.
+    function syncTouchAction() {
+        cards.forEach(card => {
+            const content = card.querySelector('.card-content');
+            const overflows = content.scrollHeight > content.clientHeight + 1;
+            content.style.touchAction = overflows ? 'pan-y' : 'none';
+        });
+    }
+    syncTouchAction();
+    window.addEventListener('resize', syncTouchAction);
+    if (document.fonts) document.fonts.ready.then(syncTouchAction);
+
+    function springBack(card) {
+        animateCard(card, {
+            translateX: 0,
+            translateY: 0, // ensure Y returns to 0
+            scale: 1,
+            rotateZ: 0,
+            duration: 400,
+            easing: 'easeOutElastic(1, .8)'
+        });
+    }
+
     cards.forEach(card => {
         card.addEventListener('pointerdown', (e) => {
             // Only drag top card
@@ -293,16 +319,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 const dirY = dy / distance;
                 nextCard(dirX, dirY);
             } else {
-                // Return to base position
-                animateCard(card, {
-                    translateX: 0,
-                    translateY: 0, // ensure Y returns to 0
-                    scale: 1,
-                    rotateZ: 0,
-                    duration: 400,
-                    easing: 'easeOutElastic(1, .8)'
-                });
+                springBack(card); // Too short to count as a swipe
             }
+        });
+
+        // The browser took the gesture over (a pan on a scrollable card, a
+        // system gesture): drop the drag and put the card back.
+        card.addEventListener('pointercancel', () => {
+            if (!isDragging) return;
+            isDragging = false;
+            if (parseInt(card.dataset.index) === currentIdx) springBack(card);
         });
     });
 });
