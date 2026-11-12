@@ -33,6 +33,11 @@ jobs:
         uses: actions/checkout@v4
       - name: Setup Pages
         uses: actions/configure-pages@v5
+      - name: Version CSS and JS URLs
+        # Pages caches every file for 10 minutes. Without a content hash in
+        # the URL, a reload right after a deploy pairs the new HTML with the
+        # previous deploy's CSS and JS (see the script for details).
+        run: python3 .github/scripts/version_assets.py .
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
