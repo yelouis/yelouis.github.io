@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Louis Ye | Software Engineer</title>
     <meta name="description"
-        content="Portfolio of Louis Ye, a Software Engineer at Google specializing in scalable backend systems and intelligent infrastructure.">
+        content="Portfolio of Louis Ye, a Software Engineer at Google who ships side projects: Gaslight Parlor on the iOS App Store, Kanjion, and Tenth Spring.">
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -44,7 +44,7 @@
                     <img src="images/portrait.jpg" alt="Louis Ye" class="hero-portrait">
                     <h1 class="hero-title mt-2">LOUIS YE</h1>
                     <h2 class="hero-subtitle">SOFTWARE ENGINEER</h2>
-                    <p class="hero-tagline">Interested in Robotics Data</p>
+                    <p class="hero-tagline">Games and AI tools, shipped on the side</p>
                     <div class="scroll-prompt mt-4">[ SWIPE / CLICK NEXT ]</div>
                 </div>
             </div>
@@ -53,13 +53,13 @@
             <div class="card" data-index="1">
                 <div class="card-content about-card">
                     <h3 class="block-title">[ ABOUT ME ]</h3>
-                    <p>I work in the AI Data organization at Google, where I focus on the large-scale data
-                        infrastructure powering advanced machine learning. On the side, I’m building specialized
-                        pipelines to filter complex first-person video data for robotics use cases, while also
-                        developing a social deduction game that explores the mechanics of game theory and information
-                        asymmetry. My interests lie at the intersection of high-scale data engineering and physical AI,
-                        balanced by a personal life spent indoor rock climbing, playing local co-op games, and reading
-                        manhwa.</p>
+                    <p>I build evaluation and autorating infrastructure in the AI Data organization at Google, where my
+                        work decides how millions of model outputs get judged. Outside of that I ship things: <strong>Gaslight
+                            Parlor</strong>, a social bluffing game live on the iOS App Store; <strong>Kanjion</strong>, a
+                        daily browser puzzle about instructing an AI agent in six lines; and <strong>Tenth Spring</strong>,
+                        a privacy-first RPG whose map you unlock by actually going places. I like small games with one
+                        sharp idea, and I like finishing them. Off the keyboard: indoor rock climbing, local co-op games,
+                        and too much manhwa.</p>
                     <div class="contact-links mt-4">
                         <a href="mailto:chengluye@gmail.com" class="btn">EMAIL</a>
                         <a href="https://linkedin.com/in/louis-ye/" class="btn" target="_blank"
@@ -69,10 +69,158 @@
                 </div>
             </div>
 
-            <!-- Card 3: EXP (GOOGLE) -->
+            <!-- Card 3: PROJECT (GASLIGHT PARLOR) -->
             <div class="card" data-index="2">
                 <div class="card-content exp-card primary-block scrollable">
-                    <h3 class="block-title">[ RECENT EXPERIENCE ]</h3>
+                    <h3 class="block-title">[ PROJECT 01 &mdash; SHIPPED ]</h3>
+                    <div class="timeline-block">
+                        <div class="timeline-header">
+                            <h4>GASLIGHT PARLOR</h4>
+                            <span class="timeline-date">iOS &middot; v1.2</span>
+                        </div>
+                        <h5 class="role">A party game about forging your friends</h5>
+                        <p class="summary">
+                            Everyone writes a fake answer to someone else's personal prompt, then the table votes on
+                            which story is the real one. Shipped end to end: App Store release, Victorian-parlor art
+                            direction, and the live room sync underneath it.
+                        </p>
+                        <h5 class="role mt-2">What it took:</h5>
+                        <p class="summary">
+                            A server-authoritative Firebase backend &mdash; every rule runs in Cloud Functions &mdash;
+                            with turn pacing on deadlines, scoring, and duplicate-bluff filtering so two players who
+                            invent the same lie don't break the round.
+                        </p>
+                        <div class="project-tags">
+                            <span class="tag">Flutter</span>
+                            <span class="tag">Dart</span>
+                            <span class="tag">Cloud Functions</span>
+                            <span class="tag">Firestore</span>
+                        </div>
+                    </div>
+                    <div class="contact-links mt-3">
+                        <a href="https://apps.apple.com/us/app/gaslight-parlor/id6805287231" class="btn" target="_blank"
+                            rel="noreferrer">APP STORE</a>
+                        <a href="https://github.com/yelouis/Gaslight" class="btn" target="_blank"
+                            rel="noreferrer">GITHUB</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 4: PROJECT (KANJION) -->
+            <div class="card" data-index="3">
+                <div class="card-content exp-card secondary-block scrollable">
+                    <h3 class="block-title">[ PROJECT 02 &mdash; LIVE ]</h3>
+                    <div class="timeline-block">
+                        <div class="timeline-header">
+                            <h4>KANJION &#28450;&#23383;&#38899;</h4>
+                            <span class="timeline-date">Web &middot; daily</span>
+                        </div>
+                        <h5 class="role">Six lines to steer an AI agent</h5>
+                        <p class="summary">
+                            You watch a looping replay of a booking made on a sandboxed clone of a Japanese rail
+                            site, then get six 60-character instructions to make an AI agent reproduce it. Copy-paste
+                            and manual clicking are off, so describing what you saw is the only move.
+                        </p>
+                        <h5 class="role mt-2">What it took:</h5>
+                        <p class="summary">
+                            A ten-page state graph covering typing, timed clicks and a signature pad, an agent that
+                            always acts instead of stalling on a vague prompt, and a deterministic fallback for when
+                            the model is down.
+                        </p>
+                        <div class="project-tags">
+                            <span class="tag">TypeScript</span>
+                            <span class="tag">React</span>
+                            <span class="tag">Gemini</span>
+                            <span class="tag">Firebase</span>
+                        </div>
+                    </div>
+                    <div class="contact-links mt-3">
+                        <a href="https://kanjion-game.web.app" class="btn" target="_blank" rel="noreferrer">PLAY</a>
+                        <a href="https://github.com/yelouis/kanjion" class="btn" target="_blank"
+                            rel="noreferrer">GITHUB</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 5: PROJECT (TENTH SPRING) -->
+            <div class="card" data-index="4">
+                <div class="card-content exp-card tertiary-block scrollable">
+                    <h3 class="block-title">[ PROJECT 03 &mdash; IN DEV ]</h3>
+                    <div class="timeline-block">
+                        <div class="timeline-header">
+                            <h4>TENTH SPRING</h4>
+                            <span class="timeline-date">Godot &middot; GDScript</span>
+                        </div>
+                        <h5 class="role">Your map is the places you have actually been</h5>
+                        <p class="summary">
+                            A creature-collection RPG for PC set a generation after a collapse. Tap "Explore Here" on the
+                            phone companion and the real city you are standing in opens on a fog-covered map &mdash; real
+                            life opens the doors, and everything behind them is earned by playing.
+                        </p>
+                        <h5 class="role mt-2">What it took:</h5>
+                        <p class="summary">
+                            Privacy as a design constraint: one location reading per tap, resolved on the phone and
+                            thrown away &mdash; only area names ever reach the PC. 905 creatures, turn-based battles.
+                        </p>
+                        <div class="project-tags">
+                            <span class="tag">Godot</span>
+                            <span class="tag">Phone companion</span>
+                            <span class="tag">E2E sync</span>
+                        </div>
+                    </div>
+                    <div class="contact-links mt-3">
+                        <a href="https://github.com/yelouis/tenth_spring" class="btn" target="_blank"
+                            rel="noreferrer">GITHUB</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 6: WORKBENCH (SMALLER EXPERIMENTS) -->
+            <div class="card" data-index="5">
+                <div class="card-content exp-card secondary-block scrollable">
+                    <h3 class="block-title">[ ON THE WORKBENCH ]</h3>
+                    <div class="timeline-block minor-block">
+                        <div class="minor-header">
+                            <h4>ANIMATED INFOGRAPHICS</h4>
+                            <span class="timeline-date">Python</span>
+                        </div>
+                        <p class="summary">Turns narration into animated explainer videos, local-first, with live
+                            generation as the goal.</p>
+                    </div>
+                    <div class="timeline-block minor-block mt-2">
+                        <div class="minor-header">
+                            <h4>PROXIMITY SWARM</h4>
+                            <span class="timeline-date">Python</span>
+                        </div>
+                        <p class="summary">Coordinates a swarm of autonomous agents working one long task
+                            together.</p>
+                    </div>
+                    <div class="timeline-block minor-block mt-2">
+                        <div class="minor-header">
+                            <h4>STORYARC</h4>
+                            <span class="timeline-date">Flutter</span>
+                        </div>
+                        <p class="summary">Turns a day of spoken conversation into a cinematic life story.</p>
+                    </div>
+                    <div class="timeline-block minor-block mt-2">
+                        <div class="minor-header">
+                            <h4>SOCIAL ROBOTICS</h4>
+                            <span class="timeline-date">Exploratory</span>
+                        </div>
+                        <p class="summary">Tested whether human reactions on video could act as unlabeled reward
+                            signals for robots. Inconclusive; parked.</p>
+                    </div>
+                    <div class="contact-links mt-2">
+                        <a href="https://github.com/yelouis?tab=repositories" class="btn" target="_blank"
+                            rel="noreferrer">ALL REPOS</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 7: EXP (GOOGLE) -->
+            <div class="card" data-index="6">
+                <div class="card-content exp-card primary-block scrollable">
+                    <h3 class="block-title">[ DAY JOB ]</h3>
                     <div class="timeline-block">
                         <div class="timeline-header">
                             <h4>GOOGLE</h4>
@@ -80,49 +228,22 @@
                         </div>
                         <h5 class="role">Software Engineer, AI Data | Mountain View, CA</h5>
                         <ul class="duties">
-                            <li><strong>AutoCrowd:</strong> Spearheaded automated hillclimbing and dataset curation from
-                                human-in-the-loop fewshot data. Integrated autorating within AIDO workflow to reduce
-                                human rating volume.</li>
-                            <li><strong>Support Intelligence:</strong> Built robust infrastructure pipelines combining a
-                                snippet ranking model into the team's RAG framework. Evaluated Gemini models for
-                                factuality and ran A/B experiments.</li>
+                            <li><strong>Autorating:</strong> Architected a Spanner multi-queue async router for batch
+                                and safety autoraters, a 5x speedup to 200k+ evals/day, and consolidated two
+                                LLM-as-a-judge stacks onto one C++ engine, cutting rubric false positives 47%.</li>
+                            <li><strong>Human-in-the-loop:</strong> Shipped autorater pre-seeding at 200k+ questions/mo
+                                with 4h deadlines and human fallback, plus native audio and video autorating across
+                                every task plugin type.</li>
+                            <li><strong>Support Intelligence:</strong> Built the production pipelines putting a learned
+                                snippet-ranking model into the team's RAG stack, and benchmarked Gemini Flash for
+                                factuality and red-team safety.</li>
                         </ul>
                     </div>
                 </div>
             </div>
 
-            <!-- Card 4: PROJECT (SOCIAL ROBOTICS) -->
-            <div class="card" data-index="3">
-                <div class="card-content exp-card primary-block">
-                    <h3 class="block-title">[ PROJECT: SOCIAL ROBOTICS ]</h3>
-                    <div class="timeline-block">
-                        <div class="timeline-header">
-                            <h4>Social-Affective Filter (SAF)</h4>
-                            <span class="timeline-date">Python | ML</span>
-                        </div>
-                        <h5 class="role">The Robotic Social Flywheel</h5>
-                        <p class="summary">
-                            An extensible data processing engine to extract social-affective metadata (gaze, prosody, pose, emotion) from egocentric video datasets, building natural reward signals to train socially-aware robots.
-                        </p>
-                        <h5 class="role mt-2">Active Processing Layers:</h5>
-                        <div class="project-tags">
-                            <span class="tag">Attention (L2CS-Net)</span>
-                            <span class="tag">Motor Resonance (YOLOv8)</span>
-                            <span class="tag">Reasonable Emotion (HSEmotion)</span>
-                            <span class="tag">Acoustic Prosody (emotion2vec+)</span>
-                            <span class="tag">Proxemic Kinematics (Depth Anything)</span>
-                        </div>
-                    </div>
-                    <div class="contact-links mt-4">
-                        <a href="https://github.com/yelouis/social_robotics" class="btn" target="_blank" rel="noreferrer">GITHUB</a>
-                        <a href="https://huggingface.co/louisye" class="btn" target="_blank" rel="noreferrer">HUGGING FACE</a>
-                    </div>
-                </div>
-            </div>
-
-
-            <!-- Card 5: EXP (PAST) -->
-            <div class="card" data-index="4">
+            <!-- Card 8: EXP (PAST) -->
+            <div class="card" data-index="7">
                 <div class="card-content exp-card secondary-block scrollable">
                     <h3 class="block-title">[ PAST EXPERIENCE ]</h3>
                     <div class="timeline-block minor-block">
@@ -130,9 +251,9 @@
                             <h4>IBM</h4>
                             <span class="timeline-date">2021</span>
                         </div>
-                        <h5 class="role">Software Engineer Intern</h5>
-                        <p class="summary">Prototyped a supply chain dashboard currently in production. Developed
-                            predictive ML models for precise ETAs.</p>
+                        <h5 class="role">Extreme Blue Software Engineer Intern</h5>
+                        <p class="summary">Prototyped a live dashboard tracking millions of dollars of shipments across
+                            IBM's supply chain, with ML models predicting ETAs to a 10% MAPE.</p>
                     </div>
                     <div class="timeline-block minor-block mt-2">
                         <div class="minor-header">
@@ -140,8 +261,8 @@
                             <span class="timeline-date">2019&ndash;2022</span>
                         </div>
                         <h5 class="role">CS Researcher</h5>
-                        <p class="summary">Coded contextual Multi-Armed Bandit algorithms and applied ML techniques on
-                            behavioral education data.</p>
+                        <p class="summary">Coded contextual Multi-Armed Bandit algorithms and modeled learning outcomes
+                            from student behavioral logs.</p>
                     </div>
                     <div class="timeline-block minor-block mt-2">
                         <div class="minor-header">
@@ -155,14 +276,14 @@
                 </div>
             </div>
 
-            <!-- Card 6: EDUCATION -->
-            <div class="card" data-index="5">
+            <!-- Card 9: EDUCATION -->
+            <div class="card" data-index="8">
                 <div class="card-content edu-card tertiary-block">
                     <h3 class="block-title">[ EDUCATION ]</h3>
                     <h4>CARLETON COLLEGE</h4>
                     <p>B.A. Computer Science &amp; Economics</p>
-                    <p class="small-text mt-2">Coursework: AI, Quantum Computing, Parallel &amp; Distributed Computing,
-                        Advanced Algorithms, Computational Math, Data Structures.</p>
+                    <p class="small-text mt-2">Coursework: Artificial Intelligence, Natural Language Processing,
+                        Distributed Systems, Advanced Algorithms, Statistical Inference, Quantum Computing.</p>
                 </div>
             </div>
 
